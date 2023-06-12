@@ -70,7 +70,7 @@ namespace ChartApp
                 var generator = new SinGenerator(Amplitude, Frequency);
                 Graph.Plot.Title(generator.Name);
                 Graph.Plot.YLabel("Амплитуда");
-                Graph.Plot.XLabel($"Временное окно, {generator.Time.ToTimeSpan().TotalSeconds} c.");
+                Graph.Plot.XLabel($"Временной интервал, {generator.Interval.TotalSeconds} c.");
 
                 var outputRenderer = new ScottPlotOutput(Graph);
 
@@ -79,6 +79,8 @@ namespace ChartApp
 
                 _isStart = true;
                 buttonAction.Content = "Остановить генерацию";
+                amplitudeTextBox.IsEnabled = false;
+                frequencyTextBox.IsEnabled = false;
             }
             else
             {
@@ -86,6 +88,8 @@ namespace ChartApp
 
                 _isStart = false;
                 buttonAction.Content = "Начать генерацию";
+                amplitudeTextBox.IsEnabled = true;
+                frequencyTextBox.IsEnabled = true;
             }
         }
 
@@ -152,7 +156,6 @@ namespace ChartApp
                 buttonAction.IsEnabled = false;
             }
         }
-
 
         private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {

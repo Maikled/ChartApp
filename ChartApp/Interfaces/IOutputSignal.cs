@@ -5,7 +5,6 @@
     /// </summary>
     internal interface IOutputSignal
     {
-        public void ReceptionSignal(double[] newSignal);
-        public void OutputSignal();
+        public void OutputSignal(double[] signal);
     }
 }

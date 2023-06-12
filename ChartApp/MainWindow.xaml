@@ -6,7 +6,7 @@
         xmlns:ScottPlot="clr-namespace:ScottPlot;assembly=ScottPlot.WPF"
         xmlns:local="clr-namespace:ChartApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" x:Name="window">
+        Title="ChartApp" Height="450" Width="800" x:Name="window">
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="5*"/>

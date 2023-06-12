@@ -12,7 +12,9 @@ namespace ChartApp
     {
         public bool IsRunning = false;
 
-        private readonly int _syncTime = 100;
+        private readonly int _syncTime = 100;               //Пауза обновления, мс               
+        private readonly object lockObject = new object();  //Объект синхронизации
+        private double[]? _signal;                          //Массив сгенерированных данных
 
         private readonly IGenerator _functionGenerator;     //Класс генерирующий данные
         private readonly IOutputSignal _outputRenderer;     //Класс отображающий данные
@@ -63,11 +65,13 @@ namespace ChartApp
         {
             while (IsRunning)
             {
-                var signal = _functionGenerator?.Generate();
-                if (signal != null)
-                    _outputRenderer?.ReceptionSignal(signal);
+                var signal = _functionGenerator.Generate();
+                lock(lockObject)
+                {
+                    _signal = signal;
+                }
 
-                Thread.Sleep(_syncTime);
+                Thread.Sleep(_syncTime);    //Пауза для достижения желаемой частоты генерации данных
             }
         }
 
@@ -78,9 +82,13 @@ namespace ChartApp
         {
             while (IsRunning)
             {
-                _outputRenderer?.OutputSignal();
+                lock(lockObject)
+                {
+                    if(_signal != null)
+                        _outputRenderer.OutputSignal(_signal);
+                }
 
-                Thread.Sleep(_syncTime);
+                Thread.Sleep(_syncTime);    //Пауза для достижения желаемой частоты отображения данных
             }
         }
     }

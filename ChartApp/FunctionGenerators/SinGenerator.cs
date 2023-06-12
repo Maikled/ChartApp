@@ -6,24 +6,24 @@ namespace ChartApp.FunctionGenerators
     public class SinGenerator : IGenerator
     {
         public string Name => "Sin";                    //Название функции, используемой для генерации данных
-        public TimeOnly Time => new TimeOnly(0, 0, 1);  //Промежуток времени генерации сигнала (временное окно)
+        public TimeSpan Interval { get; private set; }  //Интервал времени генерации сигнала (временной интервал графика)
 
         private double _amplitude;                      //Амплитуда синусойды
         private double _frequency;                      //Частота синусоиды в Герцах
         private double _samplingFrequency;              //Частота дискретизации (опроса)
         private double _phase;                          //Фаза синусойды
-        
-
+  
         private double[] signal;                        //Массив со сгенерированными данными синусойды
 
-        public SinGenerator(double amplitude, double frequency, double samplingFrequency = 1000)
+        public SinGenerator(double amplitude, double frequency, double countSecondsInterval = 1, double samplingFrequency = 1000)
         {
             _amplitude = amplitude;
             _frequency = frequency;
             _samplingFrequency = samplingFrequency;
             _phase = 0.0;
+            Interval = TimeSpan.FromSeconds(countSecondsInterval);
 
-            var count = (int)(Time.ToTimeSpan().TotalSeconds * samplingFrequency);  //Расчёт количества элемента массива исходя из времени окна и частоты дискретизации
+            var count = (int)(Interval.TotalSeconds * samplingFrequency);  //Расчёт количества элемента массива исходя из времени окна и частоты дискретизации
             signal = new double[count];
         }
 
@@ -39,7 +39,7 @@ namespace ChartApp.FunctionGenerators
             }
 
             _phase += _frequency;                       //Изменение фазы для создания эффекта движущейся волны
-            if (_phase > _samplingFrequency)            //Сброс фазы, если её значение больше частоты дискретизации
+            if (_phase > _samplingFrequency)            //Сброс фазы, если её значение больше частоты дискретизации - для предотвращения ошибки переполнения
                 _phase = 0.0;
 
             return signal;
