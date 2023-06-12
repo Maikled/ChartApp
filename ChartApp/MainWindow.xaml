@@ -34,9 +34,9 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Text="Амплитуда" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Amplitude, ElementName=window}" x:Name="amplitudeTextBox" Margin="5"/>
+                <TextBox Grid.Row="0" Grid.Column="1" x:Name="amplitudeTextBox" Margin="5" TextChanged="amplitudeTextBox_TextChanged"/>
                 <TextBlock Text="Частота" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5"/>
-                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Frequency, ElementName=window}" x:Name="frequencyTextBox" Margin="5"/>
+                <TextBox Grid.Row="1" Grid.Column="1" x:Name="frequencyTextBox" Margin="5" TextChanged="frequencyTextBox_TextChanged"/>
 
                 <TextBlock x:Name="errorTextBlock" Grid.Row="3" Grid.ColumnSpan="2" 
                            Text="Ошибка ввода данных" 

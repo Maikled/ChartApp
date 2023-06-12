@@ -1,123 +1,163 @@
 ﻿using ChartApp.FunctionGenerators;
-using ChartApp.Interfaces;
 using ChartApp.Output;
 using ChartApp.Properties;
 using System;
-using System.Diagnostics;
-using System.Threading;
 using System.Windows;
 
 namespace ChartApp
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Класс обработчик MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        public double Amplitude
+        public double Amplitude                                     //Поле амплитуды
         {
-            get { return AppSettings.Default.Amplitude; }
-            set { AppSettings.Default.Amplitude = value; }
+            get { return AppSettings.Default.Amplitude; }           //Получение данных параметра из специального элемента .settings
+            private set { AppSettings.Default.Amplitude = value; }  //Установка значения параметра в специальном элементе .settings
         }
-        public double Frequency
+        public double Frequency                                     //Поле частоты
         {
             get { return AppSettings.Default.Frequency; }
-            set { AppSettings.Default.Frequency = value; }
+            private set { AppSettings.Default.Frequency = value; }
         }
 
-        private int _syncTime = 100;
-        private bool _isRunning = false;
+        private AppController? _controller;                         //Контроллер управления генерацией и выводом сигнала
+        private bool _isStart = false;                              //Флаг действия
 
-        private IGenerator? _functionGenerator;
-        private IOutputSignal? _outputRenderer;
+        public bool SetAmplitude(object value)
+        {
+            if (ConvertParametr(value, out double convertedValue))
+            {
+                Amplitude = convertedValue;
+                return true;
+            }
+            else
+                return false;
+        }
 
-        private Thread? _generateThread;
-        private Thread? _outputThread;
+        public bool SetFrequency(object value)
+        {
+            if (ConvertParametr(value, out double convertedValue))
+            {
+                Frequency = convertedValue;
+                return true;
+            }
+            else
+                return false;
+        }
 
         public MainWindow()
         {
             InitializeComponent();
-            this.Closing += MainWindow_Closing;
+
+            amplitudeTextBox.Text = Amplitude.ToString();
+            frequencyTextBox.Text = Frequency.ToString();
+
+            this.Closing += MainWindow_Closing;             //Подписка на событие закрытия окна, с целью сохранения введённых параметров и остановки работающих потоков.
         }
 
+        /// <summary>
+        /// Обработчик нажатия на кнопку Запуска/Остановки генерации сигнала.
+        /// </summary>
         private void ButtonAction_Click(object sender, RoutedEventArgs e)
         {
-            if (double.TryParse(amplitudeTextBox.Text, out var amplitude) && double.TryParse(frequencyTextBox.Text, out var frequency))
+            //Если пользователь нажал на кнопку и при этом генерация и отображение данных не производится,
+            //то происходит создание экземпляров классов: генератора функции, отображения функции и управления, после этого происходит генерация и отображение данных,
+            //иначе происходит остановка генерации и отображения данных.
+            if (_isStart == false)
             {
-                if (_isRunning == false)
-                {
-                    Amplitude = amplitude;
-                    Frequency = frequency;
+                var generator = new SinGenerator(Amplitude, Frequency);
+                Graph.Plot.Title(generator.Name);
+                Graph.Plot.YLabel("Амплитуда");
+                Graph.Plot.XLabel($"Временное окно, {generator.Time.ToTimeSpan().TotalSeconds} c.");
 
-                    Start();
-                    buttonAction.Content = "Остановить генерацию";
+                var outputRenderer = new ScottPlotOutput(Graph);
+
+                _controller = new AppController(generator, outputRenderer);
+                _controller.Start();
+
+                _isStart = true;
+                buttonAction.Content = "Остановить генерацию";
+            }
+            else
+            {
+                _controller?.Stop();
+
+                _isStart = false;
+                buttonAction.Content = "Начать генерацию";
+            }
+        }
+
+        /// <summary>
+        /// Generic конвертер типов данных.
+        /// </summary>
+        private bool ConvertParametr<T>(object parametr, out T? value) where T : IConvertible
+        {
+            try
+            {
+                var convertedValue = Convert.ChangeType(parametr, typeof(T));
+                if (convertedValue != null)
+                {
+                    value = (T)convertedValue;
+                    return true;
                 }
                 else
                 {
-                    Stop();
-                    buttonAction.Content = "Начать генерацию";
+                    value = default(T);
+                    return false;
                 }
+            }
+            catch 
+            {
+                value = default(T);
+                return false; 
+            }
+        }
 
+        /// <summary>
+        /// Обработчик события изменения значения текстового поля ввода амплитуды (amplitudeTextBox). 
+        /// </summary>
+        private void amplitudeTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            SetField(SetAmplitude, amplitudeTextBox.Text);
+        }
+
+        /// <summary>
+        /// Обработчик события изменения значения текстового поля ввода частоты (frequencyTextBox). 
+        /// </summary>
+        private void frequencyTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            SetField(SetFrequency, frequencyTextBox.Text);
+        }
+
+        /// <summary>
+        /// Метод проверяющий установку значения поля и в зависмости от результатов производит изменение в UI.
+        /// </summary>
+        /// <param name="setValueMethod">Метод устанавливающий и проверяющий значение поля</param>
+        /// <param name="value">Устанавливаемое значение</param>
+        private void SetField(Predicate<string> setValueMethod, string value)
+        {
+            //Если введённое значение текстового поля соответсвует типу поля и значение корректно преобразовано,
+            //то происходит скрытие информационного TextBlock, содержащего сообщение об ошибке ввода данных и кнопка Начала/Окончания генерации становиться активна,
+            //иначе происходит открытие TextBlock и кнопка Начала/Окончания генерации становиться неактивна.
+            if (setValueMethod(value))
+            {
                 errorTextBlock.Visibility = Visibility.Collapsed;
+                buttonAction.IsEnabled = true;
             }
             else
             {
                 errorTextBlock.Visibility = Visibility.Visible;
+                buttonAction.IsEnabled = false;
             }
         }
 
-        private void Start()
-        {
-            _isRunning = true;
-            _functionGenerator = new SinGenerator(Amplitude, Frequency, new TimeOnly(0, 0, 1));
-            _outputRenderer = new ScottPlotOutput(Graph);
-
-            _generateThread = new Thread(GenerateSignalWave);
-            _outputThread = new Thread(RenderSignalWave);
-            _generateThread.Start();
-            _outputThread.Start();
-        }
-
-        private void Stop()
-        {
-            _isRunning = false;
-            try
-            {
-                _generateThread?.Join(10);
-                _outputThread?.Join(10);
-            }
-            catch(Exception ex)
-            {
-                Debug.WriteLine(ex);
-            }
-        }
-
-        private void GenerateSignalWave()
-        {
-            while(_isRunning)
-            {
-                var signal = _functionGenerator?.Generate();
-                if(signal != null)
-                    _outputRenderer?.ReceptionSignal(signal);
-
-                Thread.Sleep(_syncTime);
-            }
-        }
-
-        private void RenderSignalWave()
-        {
-            while(_isRunning)
-            {
-                _outputRenderer?.OutputSignal();
-
-                Thread.Sleep(_syncTime);
-            }
-        }
 
         private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
-            Stop();
-            AppSettings.Default.Save();
+            _controller?.Stop();                        //Прекращение генерации и вывода сигнала, если до закрытия окна не было выполнено остановки генерации и вывода данных.
+            AppSettings.Default.Save();                 //Сохранение параметров в элементе .settings для повторного использования при следующем запуске приложения.
         }
     }
 }

@@ -2,10 +2,13 @@
 
 namespace ChartApp.Output
 {
+    /// <summary>
+    /// Класс отображающий данные, используя библиотеку ScottPlot и элемент ScottPlot.WpfPlot.
+    /// </summary>
     internal class ScottPlotOutput : IOutputSignal
     {
-        private readonly object lockObject = new object();
-        private double[]? signal;
+        private readonly object lockObject = new object();  //Объект синхронизации
+        private double[]? signal;                           //Массив с данными для отображения на графике
 
         private ScottPlot.WpfPlot _graph;
 
@@ -14,6 +17,9 @@ namespace ChartApp.Output
             _graph = graph;
         }
 
+        /// <summary>
+        /// Метод приёма и установки данных для отображения.
+        /// </summary>
         public void ReceptionSignal(double[] newSignal)
         {
             lock (lockObject)
@@ -22,6 +28,9 @@ namespace ChartApp.Output
             }
         }
 
+        /// <summary>
+        /// Метод отображения данных на графике.
+        /// </summary>
         public void OutputSignal()
         {
             lock (lockObject)
