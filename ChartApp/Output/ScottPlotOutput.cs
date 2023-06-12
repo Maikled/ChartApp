@@ -37,6 +37,7 @@ namespace ChartApp.Output
             {
                 if (signal != null)
                 {
+                    //Отображение данных на графике в основном UI потоке 
                     _graph.Dispatcher.Invoke(() =>
                     {
                         _graph.Plot.Clear();
