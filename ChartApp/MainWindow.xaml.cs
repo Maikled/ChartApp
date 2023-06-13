@@ -29,8 +29,13 @@ namespace ChartApp
         {
             if (ConvertParametr(value, out double convertedValue))
             {
-                Amplitude = convertedValue;
-                return true;
+                if(convertedValue >= 0)
+                {
+                    Amplitude = convertedValue;
+                    return true;
+                }
+                else
+                    return false;
             }
             else
                 return false;
@@ -40,8 +45,13 @@ namespace ChartApp
         {
             if (ConvertParametr(value, out double convertedValue))
             {
-                Frequency = convertedValue;
-                return true;
+                if (convertedValue >= 0)
+                {
+                    Frequency = convertedValue;
+                    return true;
+                }
+                else
+                    return false;
             }
             else
                 return false;
