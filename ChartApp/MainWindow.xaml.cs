@@ -13,8 +13,8 @@ namespace ChartApp
     {
         public double Amplitude                                     //Поле амплитуды
         {
-            get { return AppSettings.Default.Amplitude; }           //Получение данных параметра из специального элемента .settings
-            private set { AppSettings.Default.Amplitude = value; }  //Установка значения параметра в специальном элементе .settings
+            get { return AppSettings.Default.Amplitude; }           //Получение данных параметра из специального элемента постоянной памяти .settings
+            private set { AppSettings.Default.Amplitude = value; }  //Установка значения параметра в специальном элементе постоянной памяти .settings
         }
         public double Frequency                                     //Поле частоты
         {
@@ -138,7 +138,7 @@ namespace ChartApp
         /// <summary>
         /// Метод проверяющий установку значения поля и в зависмости от результатов производит изменение в UI.
         /// </summary>
-        /// <param name="setValueMethod">Метод устанавливающий и проверяющий значение поля</param>
+        /// <param name="setValueMethod">Метод устанавливающий значение поля</param>
         /// <param name="value">Устанавливаемое значение</param>
         private void SetField(Predicate<string> setValueMethod, string value)
         {

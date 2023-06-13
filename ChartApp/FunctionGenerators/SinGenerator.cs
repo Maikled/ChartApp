@@ -13,17 +13,17 @@ namespace ChartApp.FunctionGenerators
         private double _samplingFrequency;              //Частота дискретизации (опроса)
         private double _phase;                          //Фаза синусойды
   
-        private double[] _signal;                        //Массив с сгенерированными данными синусойды
+        private double[] _signal;                       //Массив с сгенерированными данными синусойды
 
-        public SinGenerator(double amplitude, double frequency, double countSecondsInterval = 1, double samplingFrequency = 1000)
+        public SinGenerator(double amplitude, double frequency, double countSecondsInterval = 1)
         {
             _amplitude = amplitude;
             _frequency = frequency;
-            _samplingFrequency = samplingFrequency;
+            _samplingFrequency = frequency * 100;                           //Определение частоты дискретизации сигнала, умножение на 100 для большей точности отображения на графике, чем на 2.1 по т. Котельникова 
             _phase = 0.0;
             Interval = TimeSpan.FromSeconds(countSecondsInterval);
 
-            var count = (int)(Interval.TotalSeconds * samplingFrequency);  //Расчёт количества элемента массива исходя из времени окна и частоты дискретизации
+            var count = (int)(Interval.TotalSeconds * _samplingFrequency);  //Расчёт количества элемента массива исходя из времени интервала окна и частоты дискретизации
             _signal = new double[count];
         }
 

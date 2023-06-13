@@ -5,8 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ScottPlot="clr-namespace:ScottPlot;assembly=ScottPlot.WPF"
         xmlns:local="clr-namespace:ChartApp"
-        mc:Ignorable="d"
-        Title="ChartApp" Height="450" Width="800" x:Name="window">
+        mc:Ignorable="d" Title="ChartApp" Height="450" Width="800">
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="5*"/>

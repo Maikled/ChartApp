@@ -8,7 +8,7 @@ namespace ChartAppTests
         [Test]
         public void TestConstructor()
         {
-            var sinGenerator = new SinGenerator(10, 1, 2, 100);
+            var sinGenerator = new SinGenerator(10, 1, 2);
             Type typeGenerator = typeof(SinGenerator);
 
             var amplitudeFieldInfo = typeGenerator.GetField("_amplitude", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -37,13 +37,13 @@ namespace ChartAppTests
         [Test]
         public void TestGenerator()
         {
-            var sinGenerator = new SinGenerator(5, 10, 1, 10);
+            var sinGenerator = new SinGenerator(5, 10, 1);
             var resultArray = sinGenerator.Generate();
 
-            double[] expectedArray = new double[10];
+            double[] expectedArray = new double[1000];
             for(int i = 0; i < expectedArray.Length; i++)
             {
-                expectedArray[i] = 5 * Math.Sin(2 * Math.PI * 10 * i / 10);
+                expectedArray[i] = 5 * Math.Sin(2 * Math.PI * 10 * i / 1000);
             }
 
             Assert.That(resultArray, Is.EqualTo(expectedArray));
